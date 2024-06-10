@@ -15,9 +15,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold, cross_val_score
 from sklearn.datasets import fetch_california_housing
 
-
-version = "0.0.4"
-
 image = fk.ImageSpec(
     builder="unionai",
     packages=[
@@ -29,7 +26,9 @@ image = fk.ImageSpec(
     ],
 )
 
-
+# FIXME
+# Unfortunately, using ImageSpec to automatically build images is incompatible with "dynamic workflows"
+# As a hacky fix for this, I use a previously built image and hardcode that here
 image = "us-central1-docker.pkg.dev/uc-serverless-production/orgs/granthamtaylor/flytekit:xdYAO4A12ZENjcTDX08KsQ"
 
 
@@ -62,7 +61,7 @@ def train(encoded: str, prune: str, dataset: fk.types.file.FlyteFile) -> Result:
     Args:
         encoded (str): list of all remaining features
         prune (str): name of feature to exclude
-        dataset (fk.types.file.FlyteFile): _description_
+        dataset (fk.types.file.FlyteFile): parquet dataset with features
 
     Returns:
         Result: model result (includes score and name of pruned feature)
@@ -234,7 +233,7 @@ def encode(features: list[str]) -> str:
 @fk.task(container_image=image)
 def fetch_dataset() -> fk.types.file.FlyteFile:
     
-    path = Path(fk.current_context().working_directory) / "model.onnx"
+    path = Path(fk.current_context().working_directory)
     
     x, y = fetch_california_housing(as_frame=True, return_X_y=True)
     

@@ -1,2 +1,2 @@
 run:
-  poetry run unionai run --remote src/glitched.py workflow
+  poetry run unionai run --remote src/main.py workflow
